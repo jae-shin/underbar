@@ -85,7 +85,7 @@
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
     var result = [];
-    
+
     _.each(collection, function(item, index) {
       if (test(item)) {
         result.push(item);
@@ -99,10 +99,26 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    var oppTest = function(x) {
+      return !test(x);
+    };
+
+    return _.filter(collection, oppTest);
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+    var result = [];
+
+    var iterator = function(item) {
+      if (_.indexOf(result, item) === -1) {
+        result.push(item);
+      }
+    };
+
+    _.each(array, iterator);
+
+    return result;
   };
 
 
@@ -111,6 +127,11 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var result = [];
+    _.each(collection, function(value) {
+      result.push(iterator(value));
+    });
+    return result;
   };
 
   /*
@@ -152,6 +173,16 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    var callCount = 0;
+    _.each(collection, function(item) {
+      callCount++;
+      if (accumulator === undefined && callCount === 1) {
+        accumulator = item;
+      } else {
+        accumulator = iterator(accumulator, item);
+      }
+    });
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
