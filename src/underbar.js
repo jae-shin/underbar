@@ -40,7 +40,7 @@
   _.last = function(array, n) {
     var l = array.length;
     if (n === undefined) {
-      return array[l-1];
+      return array[l - 1];
     } else if (n === 0) {
       return []; 
     } else {
@@ -201,12 +201,33 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+
+    return _.reduce(collection, function(result, item) {
+      if (!result) {
+        return false;
+      } else {
+        // Need to make sure the return type is consistent!
+        return Boolean(iterator(item));
+      }
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+
+    var oppIterator = function(value) {
+      return !Boolean(iterator(value));
+    };
+
+    return !_.every(collection, oppIterator);
   };
 
 
@@ -229,11 +250,25 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      _.each(arguments[i], function(value, key) {
+        obj[key] = value;
+      });
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      _.each(arguments[i], function(value, key) {
+        if (!(key in obj)) {
+          obj[key] = value;
+        }
+      });
+    }
+    return obj;
   };
 
 
@@ -259,7 +294,7 @@
     return function() {
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
-        // infromation from one function call to another.
+        // information from one function call to another.
         result = func.apply(this, arguments);
         alreadyCalled = true;
       }
@@ -277,6 +312,28 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    // initialize an obj that holds the sets of arguments and results with which 
+    // our func has been called at least once
+    var argsCalled = {};
+
+    return function() {
+      var argArray = Array.from(arguments);
+
+      // not sure if this is the right way to distinguish between array and list
+      var argKey;
+      if (typeof argArray[0] === 'object') {
+        argKey = 'Array ' + String(argArray);
+      } else {
+        argKey = String(argArray);
+      }
+
+      if (argKey in argsCalled) {
+        return argsCalled[argKey];
+      } else {
+        argsCalled[argKey] = func.apply(this, arguments);
+        return argsCalled[argKey];
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -286,6 +343,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.from(arguments).slice(2);
+
+    var delayRun = function() {
+      func.apply(this, args);
+    };
+
+    setTimeout(delayRun, wait);
   };
 
 
