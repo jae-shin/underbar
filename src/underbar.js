@@ -317,7 +317,7 @@
     var argsCalled = {};
 
     return function() {
-      var argArray = Array.from(arguments);
+      /* var argArray = Array.from(arguments);
 
       // not sure if this is the right way to distinguish between array and list
       var argKey;
@@ -325,7 +325,9 @@
         argKey = 'Array ' + String(argArray);
       } else {
         argKey = String(argArray);
-      }
+      }*/
+
+      var argKey = JSON.stringify(arguments);
 
       if (argKey in argsCalled) {
         return argsCalled[argKey];
