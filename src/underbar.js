@@ -395,10 +395,12 @@
       return _.map(collection, function(item) {
         return functionOrKey.apply(item, args);
       });
-    } else {
+    } else if (typeof functionOrKey === 'string') {
       return _.map(collection, function(item) {
         return item[functionOrKey].apply(item, args);
       });
+    } else {
+      return;
     }
   };
 
@@ -407,6 +409,17 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if (typeof iterator === 'string') {
+      return collection.sort(function(a, b) {
+        return a[iterator] - b[iterator];
+      });
+    } else if (typeof iterator === 'function') {
+      return collection.sort(function(a, b) {
+        return iterator(a) - iterator(b);
+      });
+    } else {
+      return;
+    }
   };
 
   // Zip together two or more arrays with elements of the same index
