@@ -484,6 +484,22 @@
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var argsArray = Array.from(arguments);
+    var length = argsArray.length;
+    var base = argsArray[0];
+    var restArrays = argsArray.slice(1);
+
+    if (length === 0) {
+      return [];
+    } else if (length === 1) {
+      return base;
+    } else {
+      return _.filter(base, function(item) {
+        return _.every(restArrays, function(arr) {
+          return !_.contains(arr, item);
+        });
+      });
+    }
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
