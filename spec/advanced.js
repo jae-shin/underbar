@@ -190,6 +190,72 @@
 
     });
 
+    describe('throttle, as described in Precourse docs', function() {
+      var argSpy = sinon.spy();
+
+      beforeEach(function() {
+
+      });
+
+      checkForNativeMethods(function() {
+        _.throttle(argSpy, 100);
+      });
+
+      it('should pass arguments passed in to the original function', function() {
+        var fn = _.throttle(argSpy, 100);
+        fn(1, 2);
+        expect(argSpy).to.have.been.calledWith(1, 2);
+      });
+
+      it('should return a function that schedules a second call to the function when called \
+        within the wait period, and ignores subsequent calls until the wait period is over', function() {
+        var calledTimes = [];
+        var timeSpy = sinon.spy(function() {
+          calledTimes.push(Date.now());
+        });
+
+        var fn = _.throttle(timeSpy, 100);
+        fn();                // 0 ms: called normally
+        setTimeout(fn, 10);  // schedule call for 100 ms
+        setTimeout(fn, 25);  // ignored
+        setTimeout(fn, 35);  // ignored
+        setTimeout(fn, 45);  // ignored
+                             // 100 ms: called by schedule
+        setTimeout(fn, 225); // 225 ms: called normally
+        setTimeout(fn, 300); // schedule call for 325 ms
+        setTimeout(fn, 305); // ignored
+                             // 325 ms: called by schedule
+        setTimeout(fn, 800); // 800 ms: called normally
+        setTimeout(fn, 801); // schedule call for 900 ms
+                             // 900 ms: called by schedule
+        clock.tick(900);
+
+        var relativeTimes = calledTimes.map(function(time) {
+          return time - calledTimes[0];
+        });
+        expect(relativeTimes).to.deep.equal([0, 100, 225, 325, 800, 900]);
+      });
+
+      it('should always return the most recently returned value of the original function', function() {
+        var add = function(x, y) {
+          return x + y;
+        };
+        var throttledAdd = _.throttle(add, 100);
+        var returns = [];
+
+        setTimeout(function() { returns.push(throttledAdd(2, 3)); }, 10);  // call callback and return new value (5)
+        setTimeout(function() { returns.push(throttledAdd(2, 4)); }, 20);  // throttled; return old value (5), schedule
+        setTimeout(function() { returns.push(throttledAdd(2, 5)); }, 30);  // throttled; return old value (5)
+        setTimeout(function() { returns.push(throttledAdd(2, 6)); }, 40);  // throttled; return old value (5)
+                                                                           // 110 ms: scheduled call fires, (result discarded)
+        setTimeout(function() { returns.push(throttledAdd(2, 7)); }, 220); // call callback and return new value (9)
+        clock.tick(220);
+
+        expect(returns).to.deep.equal([5, 5, 5, 5, 9]);
+      });
+
+    });
+    
   });
 
 }());
