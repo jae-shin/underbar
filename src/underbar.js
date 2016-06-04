@@ -508,37 +508,27 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
-    // flag to record whether the func has already been called in the wait frame
-    var calledOnce = false;
+    var lastCalled = 0;
+    var lastValue;
     var queued = false;
-    var queuedArgs, returnVal;
-
-    // return the wrapped func
+    
     return function() {
-      if (!calledOnce) {
-        returnVal = func.apply(null, arguments);
-        calledOnce = true;
-        setTimeout(function() {
-          calledOnce = false;
-          if (queued) {
-            returnVal = func.apply(null, queuedArgs);
-            queued = false;
-            return returnVal;
-          }
-        }, wait);
-        return returnVal;
+      var time = Date.now() - lastCalled;
+
+      if (time >= wait) {
+        lastValue = func.apply(this, arguments);
+        lastCalled = Date.now();
       } else if (!queued) {
         queued = true;
-        queuedArgs = arguments;
-        return returnVal;
-      } else {
-        return returnVal;
+        setTimeout(function() {
+          lastValue = func.apply(this, arguments);
+          lastCalled = Date.now();
+          queued = false;
+          return lastValue;
+        }, wait - time);
       }
-
-/*
-      else {
-        _.delay.apply(null, [func, timeleft].concat(arguments));
-      }*/
+      return lastValue;
     };
   };
+
 }());
