@@ -6,9 +6,7 @@
   // Returns whatever value is passed as the argument. This function doesn't
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
-  _.identity = function(val) {
-    return val;
-  };
+  _.identity = val => val;
 
   /**
    * COLLECTIONS
@@ -31,13 +29,14 @@
 
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
-  _.first = function(array, n) {
-    return n === undefined ? array[0] : array.slice(0, n);
-  };
+  _.first = (array, n) => n === undefined ? array[0] : array.slice(0, n);
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
-  _.last = function(array, n) {
+  _.last = (array, n) => {
+    return n === undefined ? array[array.length - 1] : array.slice(arrays-n); 
+
+
     var l = array.length;
     if (n === undefined) {
       return array[l - 1];
