@@ -366,16 +366,17 @@
   // TIP: This function's test suite will ask that you not modify the original
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
-  _.shuffle = function(array) {
-    var arrCopy = array.slice();
-    var result = [];
-    var randIndex;
-    while (arrCopy.length > 0) {
-      randIndex = Math.floor(Math.random() * arrCopy.length);
-      result.push(arrCopy[randIndex]);
-      arrCopy.splice(randIndex, 1);
+  _.shuffle = array => {
+    let copyArray = array.slice();
+    let randIx, temp;
+    for (let i = 0; i < copyArray.length; i++) {
+      // generate random number between i and copyArray.length - 1
+      randIx = Math.floor(Math.random() * (copyArray.length - i)) + i;
+      temp = copyArray[randIx];
+      copyArray[randIx] = copyArray[i];
+      copyArray[i] = temp;
     }
-    return result;
+    return copyArray;
   };
 
 
