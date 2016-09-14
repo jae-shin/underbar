@@ -33,19 +33,10 @@
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
-  _.last = (array, n) => {
-    return n === undefined ? array[array.length - 1] : array.slice(arrays-n); 
-
-
-    var l = array.length;
-    if (n === undefined) {
-      return array[l - 1];
-    } else if (n === 0) {
-      return []; 
-    } else {
-      return array.slice(-n);
-    }
-  };
+  _.last = (array, n) => 
+    n === undefined ? 
+      array[array.length - 1] : 
+      array.slice(Math.max(0, array.length - n));
 
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
